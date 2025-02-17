@@ -5,6 +5,9 @@ import logging
 def unzip_files(zip_dir="arquivos", extract_dir="arquivos_extraidos"):
     """Extrai os arquivos ZIP apenas se ainda não tiverem sido extraídos."""
     
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
     if not os.path.exists(extract_dir):
         os.makedirs(extract_dir)
 
@@ -15,16 +18,22 @@ def unzip_files(zip_dir="arquivos", extract_dir="arquivos_extraidos"):
             zip_extract_path = os.path.join(extract_dir, zip_folder_name)
 
             if os.path.exists(zip_extract_path):
-                logging.info(f"Arquivo já extraído: {zip_extract_path}. Pulando extração.")
+                logger.info(f"Arquivo já extraído: {zip_extract_path}. Pulando extração.")
                 continue  # Pula a extração desse arquivo
 
             try:
                 with zipfile.ZipFile(zip_file_path, "r") as zip_ref:
                     zip_ref.extractall(zip_extract_path)
 
-                logging.info(f"Arquivos extraídos para: {zip_extract_path}")
+                logger.info(f"Arquivos extraídos para: {zip_extract_path}")
 
             except zipfile.BadZipFile:
-                logging.error(f"Erro ao extrair {zip_file}: arquivo ZIP corrompido.")
+                logger.error(f"Erro ao extrair {zip_file}: arquivo ZIP corrompido.")
             except Exception as e:
-                logging.error(f"Erro inesperado ao extrair {zip_file}: {e}")
+                logger.error(f"Erro inesperado ao extrair {zip_file}: {e}")
+
+    # Verifica se há arquivos CSV na pasta de extração
+    if os.path.exists(extract_dir) and any(file.endswith('.csv') for file in os.listdir(extract_dir)):
+        logger.info("✅ Arquivos CSV encontrados na pasta de extração.")
+    else:
+        logger.error("❌ Nenhum arquivo CSV encontrado após extração.")
