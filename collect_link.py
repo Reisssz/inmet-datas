@@ -19,27 +19,19 @@ def collect_links():
         options.add_argument("--disable-dev-shm-usage")
 
         # Inicializando o WebDriver com as opções headless
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-        
-        driver.get("https://portal.inmet.gov.br/dadoshistoricos")
+        with webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options) as driver:
+            driver.get("https://portal.inmet.gov.br/dadoshistoricos")
 
-        # Obtendo o código-fonte da página
-        page_source = driver.page_source
-        soup = BeautifulSoup(page_source, "html.parser")
+            # Obtendo e processando o código-fonte da página diretamente
+            soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        # Extraindo links dos arquivos ZIP
-        links = []
-        for a in soup.find_all("a", href=True):
-            href = a["href"]
-            if href.endswith(".zip"):
-                links.append(href)
+            # Extraindo links dos arquivos ZIP
+            links = [a["href"] for a in soup.find_all("a", href=True) if a["href"].endswith(".zip")]
 
-        logger.info(f"Links encontrados: {links}")
-
-        driver.quit()  # Fechando o navegador
-
-        return links  # Retorna os links coletados
+            logger.info(f"Links encontrados: {links}")
+            return links
 
     except Exception as e:
         logger.error(f"Erro ao coletar links: {e}")
         return []
+
