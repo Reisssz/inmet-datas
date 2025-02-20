@@ -1,45 +1,54 @@
+import os
 import pandas as pd
-from datetime import timedelta
-import re
-import logging
+import numpy as np
 
-def processar_dados(file_path):
-    """Processa um arquivo CSV, convertendo UTC para Brasília e limpando os dados."""
+def load_metadata():
+    # Criando os metadados manualmente
+    meta_data = pd.DataFrame({
+        "Chave": ["REGIÃO", "UF", "ESTAÇÃO", "CODIGO (WMO)", "LATITUDE", "LONGITUDE", "ALTITUDE", "DATA DE FUNDAÇÃO (YYYY-MM-DD)"],
+        "Valor": ["CO", "GO", "GOIANIA", "A002", -16.64277777, -49.21999999, 770, "2001-05-29"]
+    })
     
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
+    # Definindo a chave como índice
+    meta_data = meta_data.set_index("Chave").T
+    
+    return meta_data
 
+def load_weather_data(file_path, meta_data):
     try:
-        # Carregando o CSV
-        df = pd.read_csv(file_path, encoding="latin1", sep=";", low_memory=False)
-        
-        # Renomeando as colunas
-        novo_nomes_colunas = [
-            "Data", "Hora_UTC", "Temp_Max", "Temp_Min", "Umidade", "Pressao",
-            "Vento_Dir", "Vento_Vel", "Precipitacao", "Radiação_Solar", "Ponto_Orvalho",
-            "Nevoa", "Nebulosidade", "Evaporacao", "Sol_Diario", "Indice_UV",
-            "Sensacao_Termica", "Nivel_Mar", "Rajada_Vento"
+        main_data = pd.read_csv(
+            file_path,
+            sep=";",
+            encoding="latin-1",
+            decimal=",",
+            skiprows=8
+        )
+
+        names_columns = [
+            "DATA", "HORA", "PRECIP_TOTAL", "PRESSAO_ATM", 
+            "PRESSAO_MAX", "PRESSAO_MIN", "RADIACAO", 
+            "TEMP_AR", "TEMP_ORVALHO", "TEMP_MAX", 
+            "TEMP_MIN", "TEMP_ORV_MAX", "TEMP_ORV_MIN", 
+            "UMID_MAX", "UMID_MIN", "UMID_AR", 
+            "VENTO_DIR", "VENTO_RAJADA", "VENTO_VEL", 
+            "UNNAMED"
         ]
-        
-        if len(df.columns) == 19:
-            df.columns = novo_nomes_colunas
-        else:
-            logger.warning(f"⚠️ {file_path} tem {len(df.columns)} colunas, esperado 19. Verifique a estrutura!")
 
-        # Convertendo hora UTC para horário de Brasília (UTC-3)
-        df["Hora_UTC"] = pd.to_datetime(df["Hora_UTC"], errors="coerce")
-        df["Hora_Brasilia"] = df["Hora_UTC"] - timedelta(hours=3)
+        main_data.columns = names_columns
+        main_data.replace(-9999, np.nan, inplace=True)
 
-        # Aplicando limpeza nos dados (exceto nas colunas de data/hora)
-        for col in df.columns:
-            if col not in ["Data", "Hora_UTC", "Hora_Brasilia"]:
-                df[col] = df[col].apply(lambda x: re.sub(r"[^a-zA-Z0-9\s:/\-]", "", str(x)))  # Limpeza de caracteres especiais
+        # Ajuste na conversão da data para tratar o formato "YYYY/MM/DD HHMM UTC"
+        main_data["DATA_HORA"] = pd.to_datetime(main_data["DATA"] + " " + main_data["HORA"], format="%Y/%m/%d %H%M UTC", errors='coerce')
 
-        # Salvando como Excel
-        output_file = file_path.replace(".csv", ".xlsx")
-        df.to_excel(output_file, index=False)
+        main_data = main_data.drop(columns=["DATA", "HORA", "UNNAMED"], errors='ignore')
+        main_data = main_data[["DATA_HORA"] + [col for col in main_data.columns if col != "DATA_HORA"]]
 
-        logger.info(f"📁 Arquivo salvo em: {output_file}")
-    
+        for column in meta_data.columns:
+            main_data[column] = meta_data[column].iloc[0]
+
+        return main_data 
+
     except Exception as e:
-        logger.error(f"❌ Erro ao processar {file_path}: {e}")
+        print(f"Erro ao processar {file_path}: {e}")
+        return pd.DataFrame()  # Retorna um DataFrame vazio em caso de erro
+
