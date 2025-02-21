@@ -2,9 +2,9 @@ import os
 import logging
 import requests
 
-def download_files(links, download_dir="arquivos"):
+def download_files(links, download_dir="data/arquivos"):
     """Baixa arquivos ZIP apenas se ainda não existirem na pasta de destino."""
-    
+
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ def download_files(links, download_dir="arquivos"):
 
         if os.path.exists(filename):
             logger.info(f"Já existe: {filename}. Pulando.")
-            continue  
+            continue
 
         try:
             with requests.get(link, stream=True) as response:

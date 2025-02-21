@@ -6,7 +6,7 @@ import logging
 
 def collect_links():
     """Coleta os arquivos ZIP do site e retorna uma lista de links."""
-    
+
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
 
@@ -34,4 +34,3 @@ def collect_links():
     except Exception as e:
         logger.error(f"Erro ao coletar links: {e}")
         return []
-

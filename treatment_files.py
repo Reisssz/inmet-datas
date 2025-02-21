@@ -8,10 +8,10 @@ def load_metadata():
         "Chave": ["REGIÃO", "UF", "ESTAÇÃO", "CODIGO (WMO)", "LATITUDE", "LONGITUDE", "ALTITUDE", "DATA DE FUNDAÇÃO (YYYY-MM-DD)"],
         "Valor": ["CO", "GO", "GOIANIA", "A002", -16.64277777, -49.21999999, 770, "2001-05-29"]
     })
-    
+
     # Definindo a chave como índice
     meta_data = meta_data.set_index("Chave").T
-    
+
     return meta_data
 
 def load_weather_data(file_path, meta_data):
@@ -25,12 +25,12 @@ def load_weather_data(file_path, meta_data):
         )
 
         names_columns = [
-            "DATA", "HORA", "PRECIP_TOTAL", "PRESSAO_ATM", 
-            "PRESSAO_MAX", "PRESSAO_MIN", "RADIACAO", 
-            "TEMP_AR", "TEMP_ORVALHO", "TEMP_MAX", 
-            "TEMP_MIN", "TEMP_ORV_MAX", "TEMP_ORV_MIN", 
-            "UMID_MAX", "UMID_MIN", "UMID_AR", 
-            "VENTO_DIR", "VENTO_RAJADA", "VENTO_VEL", 
+            "DATA", "HORA", "PRECIP_TOTAL", "PRESSAO_ATM",
+            "PRESSAO_MAX", "PRESSAO_MIN", "RADIACAO",
+            "TEMP_AR", "TEMP_ORVALHO", "TEMP_MAX",
+            "TEMP_MIN", "TEMP_ORV_MAX", "TEMP_ORV_MIN",
+            "UMID_MAX", "UMID_MIN", "UMID_AR",
+            "VENTO_DIR", "VENTO_RAJADA", "VENTO_VEL",
             "UNNAMED"
         ]
 
@@ -46,9 +46,8 @@ def load_weather_data(file_path, meta_data):
         for column in meta_data.columns:
             main_data[column] = meta_data[column].iloc[0]
 
-        return main_data 
+        return main_data
 
     except Exception as e:
         print(f"Erro ao processar {file_path}: {e}")
         return pd.DataFrame()  # Retorna um DataFrame vazio em caso de erro
-
