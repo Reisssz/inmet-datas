@@ -4,6 +4,20 @@ from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import logging
 
+"""
+Coleta os links de arquivos ZIP disponíveis no site do INMET para download.
+
+A função utiliza o Selenium para acessar a página web de dados históricos do INMET e o BeautifulSoup para extrair os links dos arquivos ZIP presentes na página.
+
+Retorna uma lista de links para os arquivos ZIP encontrados.
+
+Função:
+- collect_links():
+  - Objetivo: Coletar e retornar uma lista de links para arquivos ZIP presentes no site do INMET.
+  - Retorno: Lista de strings, onde cada string é um link para um arquivo ZIP.
+  - Exceções: Em caso de erro, a função retorna uma lista vazia e registra o erro no log.
+"""
+
 def collect_links():
     """Coleta os arquivos ZIP do site e retorna uma lista de links."""
 

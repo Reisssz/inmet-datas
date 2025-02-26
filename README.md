@@ -1,6 +1,6 @@
 # Projeto de Coleta e Tratamento Automático de Dados INMET
 
-![INMET Logo](https://www.inmet.gov.br/portal/images/logo_inmet.png)
+![INMET Logo](https://portal.inmet.gov.br/uploads/bio/inmetlogo.png)
 
 Este projeto visa automatizar a coleta e o tratamento de dados meteorológicos do INMET (Instituto Nacional de Meteorologia). Através de **web scraping**, o projeto captura informações meteorológicas como temperatura, precipitação e outros parâmetros relevantes para análise. Os dados são processados e armazenados em arquivos CSV para facilitar a análise e visualização.
 
@@ -9,7 +9,7 @@ Este projeto visa automatizar a coleta e o tratamento de dados meteorológicos d
 - **Python**: Linguagem de programação principal
 - **Selenium**: Para automação de navegação no site do INMET
 - **Pandas**: Para manipulação e análise de dados
-- **Matplotlib** (opcional): Para visualização gráfica dos dados
+- **Streamlit** : Para visualização gráfica dos dados
 - **CSV**: Formato de armazenamento dos dados coletados
 
 ## 🚀 Funcionalidades

@@ -176,6 +176,7 @@ cython_debug/
 arquivos
 arquivos_extraidos
 arquivos_tratados
-data
+data/**
 __pycache__
 test.ipynb
+venv

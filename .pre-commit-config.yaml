@@ -24,7 +24,7 @@ repos:
     language: python
     exclude: dvc.lock|.*\.json$
     types: [text]
-    stages: [commit, push, manual]
+    stages: [pre-commit, pre-push, manual]
 
   - id: trailing-whitespace
     name: trim trailing whitespaces
@@ -33,12 +33,12 @@ repos:
     language: python
     types: [text]
     exclude: dvc.lock
-    stages: [commit, push, manual]
+    stages: [pre-commit, pre-push, manual]
 
   - id: jupyter-nb-clear-output
     name: jupyter-nb-clear-output
     files: \.ipynb$
-    stages: [commit]
+    stages: [pre-commit]
     language: system
     entry: jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace
 
@@ -48,7 +48,7 @@ repos:
     entry: check-yaml
     language: python
     types: [yaml]
-    stages: [commit]
+    stages: [pre-commit]
 
   - id: check-ast
     name: checking python AST
@@ -81,7 +81,7 @@ repos:
     types: [text]
     args: [--in-place, --wrap-summaries=79, --wrap-descriptions=79, --pre-summary-newline,
       --blank, --make-summary-multi-line]
-    stages: [commit]
+    stages: [pre-commit]
 
   - id: pylint
     name: pylint
@@ -90,7 +90,7 @@ repos:
     require_serial: true
     types_or: [python, pyi]
     args: ['--disable=C0114, E0401', --fail-under=9]
-    stages: [commit]
+    stages: [pre-commit]
 
   - id: pip-compile
     name: compiling requirements-dev.in
@@ -118,13 +118,13 @@ repos:
     - .[all]
     language_version: python3
     stages:
-    - commit
+    - pre-commit
   - id: dvc-pre-push
     additional_dependencies:
     - .[all]
     language_version: python3
     stages:
-    - push
+    - pre-push
   - id: dvc-post-checkout
     additional_dependencies:
     - .[all]

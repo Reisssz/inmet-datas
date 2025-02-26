@@ -5,3 +5,5 @@ requests
 pandas
 openpyxl
 streamlit
+pre-commit
+unicode

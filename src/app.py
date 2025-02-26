@@ -1,16 +1,36 @@
-import logging
-import os
-import pandas as pd
 import streamlit as st
 
 # Configuração da página
 st.set_page_config(page_title="Painel de Arquivos Processados", layout="wide")
 
+import logging
+import os
+import pandas as pd
+
+
+# Comentário explicativo (antes era uma docstring)
+# Este script cria uma interface no Streamlit para visualizar e baixar arquivos CSV processados.
+# Funções:
+# 1. listar_arquivos():
+#    - Objetivo: Lista todos os arquivos CSV na pasta de arquivos processados (sem subpastas).
+#    - Retorno: Uma lista contendo os nomes dos arquivos CSV encontrados na pasta.
+#
+# 2. carregar_dados(arquivo):
+#    - Objetivo: Carrega um arquivo CSV da pasta de processados em um DataFrame.
+#    - Parâmetros:
+#      - arquivo (str): Nome do arquivo CSV a ser carregado.
+#    - Retorno: Um DataFrame contendo os dados do arquivo, ou None em caso de erro.
+#
+# Interface do Streamlit:
+# - Exibe um painel onde o usuário pode selecionar um arquivo CSV processado.
+# - Mostra os dados do arquivo selecionado em um DataFrame.
+# - Disponibiliza um botão para baixar o arquivo CSV.
+
 # Configuração do logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Caminho relativo onde estão os arquivos processados
-PASTA_PROCESSADOS = os.path.join(os.path.dirname(__file__), "data", "arquivos_processados")
+PASTA_PROCESSADOS = r"C:/Users/e1051797/Desktop/inmet_data/data/arquivos_processados"
 
 def listar_arquivos():
     """Lista os arquivos CSV na pasta de processados (sem subpastas)"""

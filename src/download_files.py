@@ -2,6 +2,27 @@ import os
 import logging
 import requests
 
+"""
+Baixa arquivos ZIP a partir de uma lista de links, salvando-os em uma pasta de destino especificada.
+
+A função verifica se o arquivo já existe na pasta de destino antes de realizar o download. Se o arquivo já estiver presente, ele será ignorado. Caso contrário, o arquivo será baixado e salvo localmente.
+
+Parâmetros:
+- links (list): Lista de URLs para os arquivos ZIP a serem baixados.
+- download_dir (str): Caminho da pasta onde os arquivos serão salvos. O valor padrão é 'data/arquivos'.
+
+Retorno:
+- True: Indica que a execução foi bem-sucedida.
+
+Exceções:
+- Em caso de erro no download, a exceção será registrada no log, e o arquivo será ignorado, mas o processo continuará para os outros arquivos.
+
+Exemplo de uso:
+- links = ["https://example.com/arquivo1.zip", "https://example.com/arquivo2.zip"]
+- download_files(links)
+"""
+
+
 def download_files(links, download_dir="data/arquivos"):
     """Baixa arquivos ZIP apenas se ainda não existirem na pasta de destino."""
 

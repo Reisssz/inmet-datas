@@ -3,7 +3,34 @@ import logging
 import pandas as pd
 import re
 from datetime import datetime
-from treatment_files import load_metadata, load_weather_data
+from treatment_files import extract_metadata, load_weather_data
+
+"""
+Este módulo contém funções para processar arquivos meteorológicos extraídos em formato CSV. O fluxo de trabalho inclui a coleta de arquivos com base no ano, o processamento dos dados e a geração de novos arquivos CSV com dados limpos e formatados.
+
+1. `obter_ano_arquivo(nome_arquivo)`:
+   - Extrai o ano de um arquivo CSV a partir do nome do arquivo usando uma expressão regular.
+   
+2. `processar_todos_arquivos(pasta, pasta_saida)`:
+   - Processa todos os arquivos CSV na pasta de entrada que pertencem aos últimos 10 anos, validando e processando seus dados.
+   - Verifica se o arquivo já foi processado (presente na pasta de saída) para evitar duplicação.
+   - Os dados processados são salvos em uma pasta de saída especificada.
+
+3. `save_file(pasta="data/arquivos_extraidos", pasta_saida="data/arquivos_processados")`:
+   - Função principal para iniciar o processamento dos arquivos.
+   - Chama `processar_todos_arquivos` para processar os arquivos extraídos e salva os resultados na pasta de saída.
+   - Registra logs detalhados sobre o processo, incluindo arquivos processados, ignorados e erros encontrados.
+
+Dependências:
+- `extract_metadata()`: Extrai os metadados necessários do nome do arquivo e do conteúdo CSV.
+- `load_weather_data()`: Carrega e processa os dados meteorológicos dos arquivos CSV.
+
+Exceções:
+- Caso ocorram erros durante o processamento, eles são registrados no log, mas o fluxo não é interrompido.
+
+Exemplo de uso:
+- Para processar arquivos extraídos e salvá-los, basta chamar `save_file()`.
+"""
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -15,7 +42,7 @@ def obter_ano_arquivo(nome_arquivo):
 
 def processar_todos_arquivos(pasta, pasta_saida):
     ano_atual = datetime.now().year
-    anos_validos = set(range(ano_atual - 9, ano_atual + 1))  # Últimos 10 anos
+    anos_validos = set(range(ano_atual - 0, ano_atual + 1))  # Últimos 2 anos
 
     arquivos = [
         os.path.join(pasta, f)
@@ -44,7 +71,11 @@ def processar_todos_arquivos(pasta, pasta_saida):
 
         logger.info(f"Processando: {arquivo}")
         try:
-            meta_data = load_metadata()
+            meta_data = extract_metadata(arquivo)
+            if meta_data is None:
+                logger.error(f"Não foi possível extrair metadados. O arquivo {arquivo} não será processado.")
+                continue
+
             dados = load_weather_data(arquivo, meta_data)
 
             if not isinstance(dados, pd.DataFrame):
