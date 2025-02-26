@@ -15,7 +15,7 @@ def obter_ano_arquivo(nome_arquivo):
 
 def processar_todos_arquivos(pasta, pasta_saida):
     ano_atual = datetime.now().year
-    anos_validos = set(range(ano_atual - 1, ano_atual + 1))  # Últimos 2 anos
+    anos_validos = set(range(ano_atual - 9, ano_atual + 1))  # Últimos 10 anos
 
     arquivos = [
         os.path.join(pasta, f)

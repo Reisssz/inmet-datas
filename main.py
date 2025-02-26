@@ -1,5 +1,5 @@
 import logging
-import os
+import subprocess
 from collect_link import collect_links
 from download_files import download_files
 from extract_files import unzip_files
@@ -20,12 +20,24 @@ def main():
     # Realizar o download dos arquivos
     download_files(links)
 
-    # Extrair os arquivos ZIP
-    unzip_files(pasta_arquivos)
+    # Extrair os arquivos ZIP (corrigido para passar os dois diretórios corretamente)
+    unzip_files(pasta_arquivos, pasta_extract)
 
-    # Processar os arquivos extraídos
+    # Processar os arquivos extraídos (corrigido para passar a pasta correta)
     save_file(pasta_extract)
 
+    # Abrir o Streamlit automaticamente
+    logging.info("Abrindo painel do Streamlit...")
 
+    try:
+        # Comando para rodar o Streamlit no subprocesso
+        subprocess.run([r"C:/Users/e1051797/Desktop/inmet_data/venv/Scripts/python.exe", "-m", "streamlit", "run", "app.py"])
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Erro ao iniciar o Streamlit: {e}")
+    except FileNotFoundError:
+        logging.error("Não foi possível encontrar o arquivo app.py. Verifique o caminho."   )
+    except Exception as e:
+        logging.error(f"Ocorreu um erro ao tentar abrir o Streamlit: {e}")
+    
 if __name__ == "__main__":
     main()
