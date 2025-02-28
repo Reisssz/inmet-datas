@@ -6,4 +6,7 @@ pandas
 openpyxl
 streamlit
 pre-commit
-unicode
+unidecode
+os
+re
+

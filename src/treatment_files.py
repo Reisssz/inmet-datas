@@ -10,9 +10,8 @@ def extract_metadata(file_path):
 
     metadata_dict = {}
     for line in lines:
-        parts = line.strip().split(":;")
-        if len(parts) == 2:
-            key, value = parts
+        if ":;" in line:
+            key, value = line.strip().split(":;", 1)
             metadata_dict[key.strip()] = value.strip()
 
     match = re.search(r'INMET_([A-Z]+)_([A-Z]{2})_([A-Z0-9]+)_(.*?)_(\d{2}-\d{2}-\d{4})_A_\d{2}-\d{2}-\d{4}\.CSV', file_path, re.IGNORECASE)
@@ -21,15 +20,22 @@ def extract_metadata(file_path):
 
     regiao, uf, codigo, estacao, data_fundacao = match.groups()
 
+    def safe_float(value):
+        """Converte para float, tratando erros e substituindo valores inválidos por np.nan"""
+        try:
+            return float(value.replace(",", "."))
+        except (ValueError, AttributeError):
+            return np.nan
+
     return pd.DataFrame({
         "DATA DE FUNDAÇÃO (YYYY-MM-DD)": [data_fundacao.replace("-", "/")],
         "CODIGO (WMO)": [metadata_dict.get("CODIGO (WMO)", codigo)],
         "REGIÃO": [metadata_dict.get("REGIÃO", regiao)],
         "UF": [metadata_dict.get("UF", uf)],
         "ESTAÇÃO": [metadata_dict.get("ESTAÇÃO", estacao)],
-        "LATITUDE": [float(metadata_dict.get("LATITUDE", np.nan).replace(",", "."))],
-        "LONGITUDE": [float(metadata_dict.get("LONGITUDE", np.nan).replace(",", "."))],
-        "ALTITUDE": [float(metadata_dict.get("ALTITUDE", np.nan).replace(",", "."))]
+        "LATITUDE": [safe_float(metadata_dict.get("LATITUDE"))],
+        "LONGITUDE": [safe_float(metadata_dict.get("LONGITUDE"))],
+        "ALTITUDE": [safe_float(metadata_dict.get("ALTITUDE"))]
     })
 
 # Função para carregar os dados meteorológicos e adicionar metadados
