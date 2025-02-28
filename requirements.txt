@@ -4,3 +4,9 @@ beautifulsoup4
 requests
 pandas
 openpyxl
+streamlit
+pre-commit
+unidecode
+os
+re
+
