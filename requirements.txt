@@ -7,6 +7,4 @@ openpyxl
 streamlit
 pre-commit
 unidecode
-os
-re
 
