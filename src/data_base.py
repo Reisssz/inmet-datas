@@ -4,8 +4,8 @@ import sqlite3
 import unidecode
 
 # Caminhos das pastas e do banco de dados
-processed_folder = r"C:\Users\e1051797\Documents\inmet_data\data\arquivos_processados"
-db_path = r"C:\Users\e1051797\Documents\inmet_data\data\database_inmet.db"
+processed_folder = "data\arquivos_processados"
+db_path = "data\database_inmet.db"
 table_name = "dados_meteorologicos"
 
 def find_all_csv_files(folder):

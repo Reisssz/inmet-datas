@@ -74,8 +74,8 @@ def save_to_csv(df, output_file):
     df.to_csv(output_file, index=False, sep=";", encoding="utf-8", decimal=",")
 
 # Pastas de entrada e saída
-input_folder = r"C:\Users\e1051797\Documents\inmet_data\data\arquivos_extraidos"
-output_folder = r"C:\Users\e1051797\Documents\inmet_data\data\arquivos_processados"
+input_folder = "data\arquivos_extraidos"
+output_folder = "data\arquivos_processados"
 
 # Cria a pasta de saída, se não existir
 os.makedirs(output_folder, exist_ok=True)
