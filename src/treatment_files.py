@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import re
 import os
-from config import input_folder, output_folder
+from config.config import INPUT_FOLDER, OUTPUT_FOLDER
 
 # Função para extrair metadados do arquivo
 def extract_metadata(file_path):
@@ -75,19 +75,19 @@ def save_to_csv(df, output_file):
     df.to_csv(output_file, index=False, sep=";", encoding="utf-8", decimal=",")
 
 # Cria a pasta de saída, se não existir
-os.makedirs(output_folder, exist_ok=True)
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 # Verifica se a pasta de entrada existe
-if not os.path.exists(input_folder):
-    print(f"Erro: A pasta de entrada '{input_folder}' não existe.")
+if not os.path.exists(INPUT_FOLDER):
+    print(f"Erro: A pasta de entrada '{INPUT_FOLDER}' não existe.")
 else:
     # Lista todos os arquivos que seguem o padrão INMET_*.CSV
-    files_to_process = [f for f in os.listdir(input_folder) if re.match(r'INMET_[A-Z]+_[A-Z]{2}_[A-Z0-9]+_.*?_\d{2}-\d{2}-\d{4}_A_\d{2}-\d{2}-\d{4}\.CSV', f, re.IGNORECASE)]
+    files_to_process = [f for f in os.listdir(INPUT_FOLDER) if re.match(r'INMET_[A-Z]+_[A-Z]{2}_[A-Z0-9]+_.*?_\d{2}-\d{2}-\d{4}_A_\d{2}-\d{2}-\d{4}\.CSV', f, re.IGNORECASE)]
 
     # Processa cada arquivo
     for file_name in files_to_process:
-        input_file_path = os.path.join(input_folder, file_name)
-        output_file_path = os.path.join(output_folder, file_name)  # Mantém extensão .CSV
+        input_file_path = os.path.join(INPUT_FOLDER, file_name)
+        output_file_path = os.path.join(OUTPUT_FOLDER, file_name)  # Mantém extensão .CSV
 
         # Se já foi processado, pula
         if os.path.exists(output_file_path):

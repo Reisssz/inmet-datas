@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import sqlite3
 import unidecode
-from config import processed_folder, db_path, table_name
+from config.config import PROCESSED_FOLDER, DB_PATH, TABLE_NAME
 
 
 def find_all_csv_files(folder):
@@ -24,8 +24,8 @@ def normalize_column_names(columns):
         new_columns[col] = new_col_ascii[:30]  # Limita a 30 caracteres
     return new_columns
 
-def concatenate_and_save_to_db(processed_folder, db_path, table_name):
-    files = find_all_csv_files(processed_folder)
+def concatenate_and_save_to_db(PROCESSED_FOLDER, DB_PATH, TABLE_NAME):
+    files = find_all_csv_files(PROCESSED_FOLDER)
 
     if not files:
         print("Nenhum arquivo CSV encontrado na pasta processada.")
@@ -48,10 +48,10 @@ def concatenate_and_save_to_db(processed_folder, db_path, table_name):
         final_df.rename(columns=normalize_column_names(final_df.columns), inplace=True)
 
         # Conecta ao banco SQLite
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(DB_PATH)
         try:
-            final_df.to_sql(table_name, conn, if_exists="replace", index=False)
-            print(f"Dados salvos no banco de dados SQLite na tabela '{table_name}'.")
+            final_df.to_sql(TABLE_NAME, conn, if_exists="replace", index=False)
+            print(f"Dados salvos no banco de dados SQLite na tabela '{TABLE_NAME}'.")
         except Exception as e:
             print(f"Erro ao salvar os dados no banco de dados: {e}")
         finally:
@@ -60,4 +60,4 @@ def concatenate_and_save_to_db(processed_folder, db_path, table_name):
         print("Nenhum dado foi processado.")
 
 # Executa a função
-concatenate_and_save_to_db(processed_folder, db_path, table_name)
+concatenate_and_save_to_db(PROCESSED_FOLDER, DB_PATH, TABLE_NAME)
