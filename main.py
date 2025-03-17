@@ -3,7 +3,7 @@ from collect_link import collect_links
 from download_files import download_files
 from extract_files import unzip_files
 from process_files import save_file
-from treatment_files import load_weather_data
+from src.treatment_files import load_weather_data
 from data_base import concatenate_and_save_to_db
 
 def main():
