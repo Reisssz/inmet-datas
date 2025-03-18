@@ -8,3 +8,4 @@ streamlit
 pre-commit
 unidecode
 plotly
+psutil

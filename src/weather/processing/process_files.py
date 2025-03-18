@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 import re
 from datetime import datetime
-from src.treatment_files import extract_metadata, load_weather_data
+from weather.processing.treatment_files import extract_metadata, load_weather_data
 
 """
 Este módulo contém funções para processar arquivos meteorológicos extraídos em formato CSV. O fluxo de trabalho inclui a coleta de arquivos com base no ano, o processamento dos dados e a geração de novos arquivos CSV com dados limpos e formatados.

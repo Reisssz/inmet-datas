@@ -1,12 +1,10 @@
 import pandas as pd
 import numpy as np
 import re
-import os
-from config.config import INPUT_FOLDER, OUTPUT_FOLDER
-
+from weather.config.config import FILE_PATH
 # Função para extrair metadados do arquivo
-def extract_metadata(file_path):
-    with open(file_path, "r", encoding="latin-1") as f:
+def extract_metadata():
+    with open(FILE_PATH, "r", encoding="latin-1") as f:
         lines = f.readlines()[:8]  # Lê apenas as primeiras linhas, onde estão os metadados
 
     metadata_dict = {}
@@ -15,7 +13,7 @@ def extract_metadata(file_path):
             key, value = line.strip().split(":;", 1)
             metadata_dict[key.strip()] = value.strip()
 
-    match = re.search(r'INMET_([A-Z]+)_([A-Z]{2})_([A-Z0-9]+)_(.*?)_(\d{2}-\d{2}-\d{4})_A_\d{2}-\d{2}-\d{4}\.CSV', file_path, re.IGNORECASE)
+    match = re.search(r'INMET_([A-Z]+)_([A-Z]{2})_([A-Z0-9]+)_(.*?)_(\d{2}-\d{2}-\d{4})_A_\d{2}-\d{2}-\d{4}\.CSV', FILE_PATH, re.IGNORECASE)
     if not match:
         return pd.DataFrame()
 
@@ -40,9 +38,9 @@ def extract_metadata(file_path):
     })
 
 # Função para carregar os dados meteorológicos e adicionar metadados
-def load_weather_data(file_path, meta_data):
+def load_weather_data(meta_data):
     try:
-        main_data = pd.read_csv(file_path, sep=";", encoding="latin-1", decimal=",", skiprows=8)
+        main_data = pd.read_csv(FILE_PATH, sep=";", encoding="latin-1", decimal=",", skiprows=8)
 
         names_columns = [
             "DATA", "HORA", "PRECIP_TOTAL", "PRESSAO_ATM",
@@ -67,41 +65,9 @@ def load_weather_data(file_path, meta_data):
         return main_data[columns_order]
 
     except Exception as e:
-        print(f"Erro ao processar {file_path}: {e}")
+        print(f"Erro ao processar {FILE_PATH}: {e}")
         return pd.DataFrame()
 
 # Função para salvar o DataFrame em um arquivo CSV
 def save_to_csv(df, output_file):
     df.to_csv(output_file, index=False, sep=";", encoding="utf-8", decimal=",")
-
-# Cria a pasta de saída, se não existir
-os.makedirs(OUTPUT_FOLDER, exist_ok=True)
-
-# Verifica se a pasta de entrada existe
-if not os.path.exists(INPUT_FOLDER):
-    print(f"Erro: A pasta de entrada '{INPUT_FOLDER}' não existe.")
-else:
-    # Lista todos os arquivos que seguem o padrão INMET_*.CSV
-    files_to_process = [f for f in os.listdir(INPUT_FOLDER) if re.match(r'INMET_[A-Z]+_[A-Z]{2}_[A-Z0-9]+_.*?_\d{2}-\d{2}-\d{4}_A_\d{2}-\d{2}-\d{4}\.CSV', f, re.IGNORECASE)]
-
-    # Processa cada arquivo
-    for file_name in files_to_process:
-        input_file_path = os.path.join(INPUT_FOLDER, file_name)
-        output_file_path = os.path.join(OUTPUT_FOLDER, file_name)  # Mantém extensão .CSV
-
-        # Se já foi processado, pula
-        if os.path.exists(output_file_path):
-            print(f"Arquivo já processado, pulando: {file_name}")
-            continue
-
-        # Extrai metadados e processa os dados
-        meta_data = extract_metadata(input_file_path)
-
-        if not meta_data.empty:
-            weather_data = load_weather_data(input_file_path, meta_data)
-            save_to_csv(weather_data, output_file_path)
-            print(f"Arquivo salvo com sucesso: {output_file_path}")
-        else:
-            print(f"Falha ao processar: {file_name}")
-
-    print("✅ Processamento concluído!")

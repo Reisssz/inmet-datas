@@ -1,6 +1,7 @@
 import os
 import zipfile
 import logging
+from weather.config.config import zip_dir,extract_dir
 
 """
 Extrai arquivos ZIP de um diretório para outro, evitando extrações duplicadas.
@@ -25,7 +26,7 @@ Exemplo de uso:
 """
 
 
-def unzip_files(zip_dir="data/arquivos", extract_dir="data/arquivos_extraidos"):
+def unzip_files():
     """Extrai arquivos ZIP para uma pasta específica, evitando extrações duplicadas."""
 
     logging.basicConfig(level=logging.INFO)

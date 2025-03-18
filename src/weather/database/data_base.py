@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import sqlite3
 import unidecode
-from config.config import PROCESSED_FOLDER, DB_PATH, TABLE_NAME
+from weather.config.config import PROCESSED_FOLDER, DB_PATH, TABLE_NAME
 
 
 def find_all_csv_files(folder):
