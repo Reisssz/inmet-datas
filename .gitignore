@@ -145,8 +145,5 @@ cython_debug/
 #notebook
 notebook.ipynb
 
-#toml
-pyproject.toml
-
 #dados
 data/

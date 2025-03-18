@@ -25,4 +25,4 @@ Este projeto visa automatizar a coleta e o tratamento de dados meteorológicos d
 Clone este repositório em seu ambiente local:
 
 ```bash
-git clone https://github.com/seu-usuario/projeto-inmet.git
+git clone https://github.com/Reisssz/inmet-datas
