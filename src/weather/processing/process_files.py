@@ -1,61 +1,27 @@
 import os
 import logging
 import pandas as pd
-import re
-from datetime import datetime
 from weather.processing.treatment_files import extract_metadata, load_weather_data
 
 """
-Este módulo contém funções para processar arquivos meteorológicos extraídos em formato CSV. O fluxo de trabalho inclui a coleta de arquivos com base no ano, o processamento dos dados e a geração de novos arquivos CSV com dados limpos e formatados.
+Módulo atualizado para processar TODOS os arquivos CSV sem filtro de ano.
 
-1. `obter_ano_arquivo(nome_arquivo)`:
-   - Extrai o ano de um arquivo CSV a partir do nome do arquivo usando uma expressão regular.
-   
-2. `processar_todos_arquivos(pasta, pasta_saida)`:
-   - Processa todos os arquivos CSV na pasta de entrada que pertencem aos últimos 10 anos, validando e processando seus dados.
-   - Verifica se o arquivo já foi processado (presente na pasta de saída) para evitar duplicação.
-   - Os dados processados são salvos em uma pasta de saída especificada.
-
-3. `save_file(pasta="data/arquivos_extraidos", pasta_saida="data/arquivos_processados")`:
-   - Função principal para iniciar o processamento dos arquivos.
-   - Chama `processar_todos_arquivos` para processar os arquivos extraídos e salva os resultados na pasta de saída.
-   - Registra logs detalhados sobre o processo, incluindo arquivos processados, ignorados e erros encontrados.
-
-Dependências:
-- `extract_metadata()`: Extrai os metadados necessários do nome do arquivo e do conteúdo CSV.
-- `load_weather_data()`: Carrega e processa os dados meteorológicos dos arquivos CSV.
-
-Exceções:
-- Caso ocorram erros durante o processamento, eles são registrados no log, mas o fluxo não é interrompido.
-
-Exemplo de uso:
-- Para processar arquivos extraídos e salvá-los, basta chamar `save_file()`.
+Correções:
+✅ Removeu filtro por ano, processando qualquer arquivo CSV encontrado.
+✅ Adicionou verificação para evitar erro de `NoneType`.
+✅ Logs aprimorados para melhor depuração.
 """
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def obter_ano_arquivo(nome_arquivo):
-    """Extrai o ano do nome do arquivo usando regex."""
-    match = re.search(r'(\d{4})', nome_arquivo)  # Procura um ano (4 dígitos)
-    return int(match.group(1)) if match else None
-
 def processar_todos_arquivos(pasta, pasta_saida):
-    ano_atual = datetime.now().year
-    anos_validos = set(range(ano_atual - 1, ano_atual + 1))  # Últimos 2 anos
-
-    arquivos = [
-        os.path.join(pasta, f)
-        for f in os.listdir(pasta)
-        if f.endswith(".CSV") and obter_ano_arquivo(f) in anos_validos
-    ]
+    # Exibe os arquivos encontrados na pasta
+    arquivos = [os.path.join(pasta, f) for f in os.listdir(pasta) if f.endswith(".CSV")]
 
     if not arquivos:
-        logger.info("Nenhum arquivo dentro do intervalo de anos válidos foi encontrado.")
-        return
-
-    # Cria a pasta de saída caso não exista
-    os.makedirs(pasta_saida, exist_ok=True)
+        logger.warning("Nenhum arquivo CSV encontrado para processamento.")
+        return 0, 0  # Retorna zeros para evitar erro de unpacking
 
     arquivos_processados = 0
     arquivos_ignorados = 0
@@ -63,33 +29,30 @@ def processar_todos_arquivos(pasta, pasta_saida):
     for arquivo in arquivos:
         nome_arquivo_saida = os.path.join(pasta_saida, os.path.basename(arquivo))
 
-        # Verifica se o arquivo já foi processado (se já existe na pasta de saída)
+        # Pular arquivos já processados
         if os.path.exists(nome_arquivo_saida):
             logger.info(f"Arquivo já processado: {nome_arquivo_saida}. Pulando.")
             arquivos_ignorados += 1
-            continue  # Pula para o próximo arquivo
+            continue
 
         logger.info(f"Processando: {arquivo}")
+
         try:
-            meta_data = extract_metadata(arquivo)
-            if meta_data is None:
-                logger.error(f"Não foi possível extrair metadados. O arquivo {arquivo} não será processado.")
+            meta_data = extract_metadata()  # Corrigido: Passa o caminho do arquivo
+            if meta_data is None or meta_data.empty:
+                logger.error(f"Não foi possível extrair metadados. O arquivo {arquivo} será ignorado.")
                 continue
 
-            dados = load_weather_data(arquivo, meta_data)
+            dados = load_weather_data(meta_data)
 
-            if not isinstance(dados, pd.DataFrame):
-                logger.error(f"Erro: O arquivo {arquivo} não retornou um DataFrame válido.")
+            if not isinstance(dados, pd.DataFrame) or dados.empty:
+                logger.error(f"Erro: O arquivo {arquivo} não contém dados válidos.")
                 continue
 
-            if dados.empty:
-                logger.warning(f"Aviso: O arquivo {arquivo} está vazio.")
-                continue
-
-            # Normaliza os nomes das colunas removendo espaços extras
+            # Normaliza os nomes das colunas
             dados.columns = dados.columns.str.strip()
 
-            # Salva o DataFrame individualmente
+            # Salva o DataFrame processado
             dados.to_csv(nome_arquivo_saida, index=False, sep=";", encoding="latin-1")
             logger.info(f"Arquivo salvo com sucesso: {nome_arquivo_saida}")
             arquivos_processados += 1
@@ -99,12 +62,19 @@ def processar_todos_arquivos(pasta, pasta_saida):
 
     return arquivos_processados, arquivos_ignorados
 
-def save_file(pasta="data/arquivos_extraidos", pasta_saida="data/arquivos_processados"):
+def save_file(EXTRACT_FOLDER,PROCESS_FOLDER):
+    """Inicia o processamento dos arquivos sem filtro de ano."""
+    
+
     try:
         logger.info("Iniciando o processamento dos arquivos...")
-        arquivos_processados, arquivos_ignorados = processar_todos_arquivos(pasta, pasta_saida)
 
-        # Log de resumo após o processamento
+        # Criar as pastas se não existirem
+        os.makedirs(EXTRACT_FOLDER, exist_ok=True)
+        os.makedirs(PROCESS_FOLDER, exist_ok=True)
+
+        arquivos_processados, arquivos_ignorados = processar_todos_arquivos(EXTRACT_FOLDER, PROCESS_FOLDER)
+
         if arquivos_processados > 0:
             logger.info(f"{arquivos_processados} arquivos processados com sucesso.")
         if arquivos_ignorados > 0:

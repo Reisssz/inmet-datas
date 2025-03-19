@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
 import re
-from weather.config.config import FILE_PATH
+from weather.config.config import PROCESS_FOLDER,EXTRACT_FILE
+
 # Função para extrair metadados do arquivo
 def extract_metadata():
-    with open(FILE_PATH, "r", encoding="latin-1") as f:
+    with open(EXTRACT_FILE) as f:
         lines = f.readlines()[:8]  # Lê apenas as primeiras linhas, onde estão os metadados
 
     metadata_dict = {}
@@ -13,7 +14,7 @@ def extract_metadata():
             key, value = line.strip().split(":;", 1)
             metadata_dict[key.strip()] = value.strip()
 
-    match = re.search(r'INMET_([A-Z]+)_([A-Z]{2})_([A-Z0-9]+)_(.*?)_(\d{2}-\d{2}-\d{4})_A_\d{2}-\d{2}-\d{4}\.CSV', FILE_PATH, re.IGNORECASE)
+    match = re.search(r'INMET_([A-Z]+)_([A-Z]{2})_([A-Z0-9]+)_(.*?)_(\d{2}-\d{2}-\d{4})_A_\d{2}-\d{2}-\d{4}\.CSV', EXTRACT_FILE, re.IGNORECASE)
     if not match:
         return pd.DataFrame()
 
@@ -40,7 +41,7 @@ def extract_metadata():
 # Função para carregar os dados meteorológicos e adicionar metadados
 def load_weather_data(meta_data):
     try:
-        main_data = pd.read_csv(FILE_PATH, sep=";", encoding="latin-1", decimal=",", skiprows=8)
+        main_data = pd.read_csv(EXTRACT_FILE, sep=";", encoding="latin-1", decimal=",", skiprows=8)
 
         names_columns = [
             "DATA", "HORA", "PRECIP_TOTAL", "PRESSAO_ATM",
@@ -65,9 +66,22 @@ def load_weather_data(meta_data):
         return main_data[columns_order]
 
     except Exception as e:
-        print(f"Erro ao processar {FILE_PATH}: {e}")
+        print(f"Erro ao processar {EXTRACT_FILE}: {e}")
         return pd.DataFrame()
 
-# Função para salvar o DataFrame em um arquivo CSV
-def save_to_csv(df, output_file):
+# Função para salvar o DataFrame em um arquivo CSV na pasta de arquivos processados
+def save_to_csv(df, filename):
+    output_file = f"{PROCESS_FOLDER}/{filename}"
     df.to_csv(output_file, index=False, sep=";", encoding="utf-8", decimal=",")
+    print(f"Arquivo salvo em: {output_file}")
+
+# Extraindo metadados e processando os dados
+meta_data = extract_metadata()
+if not meta_data.empty:
+    weather_data = load_weather_data(meta_data)
+    if not weather_data.empty:
+        save_to_csv(weather_data, "dados_processados.csv")
+    else:
+        print("Erro: Nenhum dado meteorológico processado.")
+else:
+    print("Erro: meta_data não foi extraído corretamente.")

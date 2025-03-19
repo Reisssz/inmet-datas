@@ -1,11 +1,7 @@
-PROCESSED_FOLDER = "data/arquivos_processados"
-DB_PATH = "data/database_inmet.db"
-TABLE_NAME = "dados_meteorologicos"
-INPUT_FOLDER =  "data/arquivos_extraidos"
-OUTPUT_FOLDER = "data/arquivos_processados"
-PASTA_ARQUIVOS = "data/arquivos"
-PASTA_EXTRACT = "data/arquivos_extraidos"
-PASTA_PROCESSADOS = "data/arquivos_processados"
-FILE_PATH = "data/arquivos"
-extract_dir="data/arquivos_extraidos"
-zip_dir="data/arquivos"
+FOLDER_MAIN = "data/arquivos"
+
+EXTRACT_FILE = "data/arquivos_extraidos/INMET_CO_DF_A001_BRASILIA_01-01-2001_A_31-12-2001.CSV"
+EXTRACT_FOLDER = "data/arquivos_extraidos"
+
+
+PROCESS_FOLDER = "data/arquivos_processados"

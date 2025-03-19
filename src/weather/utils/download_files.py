@@ -1,6 +1,7 @@
 import os
 import logging
 import requests
+from weather.config.config import FOLDER_MAIN
 
 """
 Baixa arquivos ZIP a partir de uma lista de links, salvando-os em uma pasta de destino especificada.
@@ -23,16 +24,16 @@ Exemplo de uso:
 """
 
 
-def download_files(links, download_dir="data/arquivos"):
+def download_files(links):
     """Baixa arquivos ZIP apenas se ainda não existirem na pasta de destino."""
 
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
 
-    os.makedirs(download_dir, exist_ok=True)
+    os.makedirs(FOLDER_MAIN, exist_ok=True)
 
     for link in links:
-        filename = os.path.join(download_dir, os.path.basename(link))
+        filename = os.path.join(FOLDER_MAIN, os.path.basename(link))
 
         if os.path.exists(filename):
             logger.info(f"Já existe: {filename}. Pulando.")
