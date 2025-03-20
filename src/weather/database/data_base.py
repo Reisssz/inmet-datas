@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import sqlite3
 import unidecode
-from weather.config.config import DB_FOLDER, DB_PATH, TABLE_NAME, PROCESSED_DATA_DIR
+from weather.config.config import PROCESS_FOLDER,DB_PATH,TABLE_NAME,PROCESS_FILES
 
 def find_all_csv_files(folder):
     """Busca recursivamente por arquivos CSV na pasta especificada."""
@@ -23,41 +23,41 @@ def normalize_column_names(columns):
         new_columns[col] = new_col[:30]  # Limita a 30 caracteres
     return new_columns
 
-def read_csv_safely(file_path):
+def read_csv_safely():
     """Tenta ler um arquivo CSV ajustando automaticamente o separador."""
     try:
-        df = pd.read_csv(file_path, sep=";", encoding="latin-1", decimal=",", na_values=["", " "])
+        df = pd.read_csv(PROCESS_FILES, sep=";", encoding="latin-1", decimal=",", na_values=["", " "])
         return df
     except pd.errors.ParserError:
         try:
-            df = pd.read_csv(file_path, sep=",", encoding="latin-1", decimal=",", na_values=["", " "])
+            df = pd.read_csv(PROCESS_FILES, sep=",", encoding="latin-1", decimal=",", na_values=["", " "])
             return df
         except pd.errors.ParserError:
-            print(f"Erro ao analisar CSV (verifique o delimitador): {file_path}")
+            print(f"Erro ao analisar CSV (verifique o delimitador): {PROCESS_FOLDER}")
             return None
 
 def concatenate_and_save_to_db():
     """Concatena todos os arquivos CSV da pasta processada e salva no banco de dados."""
     
-    if not os.path.exists(PROCESSED_DATA_DIR):
-        print(f"Pasta não encontrada: {PROCESSED_DATA_DIR}")
+    if not os.path.exists(PROCESS_FOLDER):
+        print(f"Pasta não encontrada: {PROCESS_FOLDER}")
         return
 
-    csv_files = find_all_csv_files(PROCESSED_DATA_DIR)
+    csv_files = find_all_csv_files(PROCESS_FOLDER)
     if not csv_files:
-        print("Nenhum arquivo CSV encontrado para processamento.")
+        print("Nenhum arquivo CSV encontrado para processamento 223.")
         return
 
     all_dataframes = []
 
     for file_path in csv_files:
-        if os.path.getsize(file_path) < 10:  # Verifica se o arquivo está vazio
-            print(f"Arquivo vazio ou corrompido: {file_path}")
+        if os.path.getsize(PROCESS_FOLDER) < 10:  # Verifica se o arquivo está vazio
+            print(f"Arquivo vazio ou corrompido: {PROCESS_FOLDER}")
             continue
 
-        df = read_csv_safely(file_path)
+        df = read_csv_safely()
         if df is None or df.empty or df.columns.size == 0:
-            print(f"Arquivo sem dados úteis: {file_path}")
+            print(f"Arquivo sem dados úteis: {PROCESS_FOLDER}")
             continue
 
         # Normaliza os nomes das colunas

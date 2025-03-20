@@ -2,6 +2,7 @@ import os
 import logging
 import pandas as pd
 from weather.processing.treatment_files import extract_metadata, load_weather_data
+from weather.config.config import PROCESS_FOLDER,FOLDER_MAIN,PROCESS_FILES
 
 """
 Módulo atualizado para processar TODOS os arquivos CSV sem filtro de ano.
@@ -15,19 +16,19 @@ Correções:
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def processar_todos_arquivos(pasta, pasta_saida):
+def processar_todos_arquivos():
     # Exibe os arquivos encontrados na pasta
-    arquivos = [os.path.join(pasta, f) for f in os.listdir(pasta) if f.endswith(".CSV")]
+    arquivos = [os.path.join(PROCESS_FILES, f) for f in os.listdir(PROCESS_FILES) if f.endswith(".CSV")]
 
     if not arquivos:
-        logger.warning("Nenhum arquivo CSV encontrado para processamento.")
+        logger.warning("Nenhum arquivo CSV encontrado para processamento 22.")
         return 0, 0  # Retorna zeros para evitar erro de unpacking
 
     arquivos_processados = 0
     arquivos_ignorados = 0
 
     for arquivo in arquivos:
-        nome_arquivo_saida = os.path.join(pasta_saida, os.path.basename(arquivo))
+        nome_arquivo_saida = os.path.join(PROCESS_FOLDER, os.path.basename(arquivo))
 
         # Pular arquivos já processados
         if os.path.exists(nome_arquivo_saida):
