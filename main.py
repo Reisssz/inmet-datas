@@ -1,16 +1,15 @@
 import logging
-import os
-import re
-from weather.utils.collect_link import collect_links
-from weather.utils.download_files import download_files
-from weather.utils.extract_files import unzip_files
-from weather.processing.process_files import save_file
-from weather.database.data_base import concatenate_and_save_to_db
-from weather.processing.treatment_files import extract_metadata,save_to_csv,load_weather_data
-from weather.config.config import FOLDER_MAIN,FOLDER_MAIN,PROCESS_FOLDER,EXTRACT_FOLDER
+from src.weather.collect_link import collect_links
+from src.weather.download_files import download_files
+from src.weather.extract_files import unzip_files
+from src.weather.process_files import save_file
+from src.weather.treatment_files import load_weather_data
+from src.weather.data_base import concatenate_and_save_to_db
+from src.weather.config.config import PASTA_ARQUIVOS,PASTA_EXTRACT,PASTA_PROCESSADOS,DB_PATH,TABLE_NAME
 
 def main():
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
     # Coletar links dos arquivos ZIP
     links = collect_links()
     if not links:
@@ -24,47 +23,38 @@ def main():
     except Exception as e:
         logging.error(f"Erro ao baixar os arquivos: {e}")
         return
- 
+
     # Extrair os arquivos ZIP
     try:
-        unzip_files()
+        unzip_files(PASTA_ARQUIVOS, PASTA_EXTRACT)
         logging.info("Arquivos extraídos com sucesso.")
     except Exception as e:
         logging.error(f"Erro ao extrair os arquivos: {e}")
         return
+
     # Processar os arquivos extraídos
     try:
-        save_file(EXTRACT_FOLDER,PROCESS_FOLDER)
+        save_file(PASTA_EXTRACT)
         logging.info("Arquivos processados com sucesso.")
     except Exception as e:
         logging.error(f"Erro ao processar os arquivos: {e}")
         return
 
-    
-
-    # Verificar se a pasta de entrada existe
-    if not os.path.exists(FOLDER_MAIN):
-        logging.error(f"Erro: A pasta de entrada '{FOLDER_MAIN}' não existe.")
+    # Tratar os arquivos e salvar no formato final
+    try:
+        load_weather_data(PASTA_EXTRACT, PASTA_PROCESSADOS)
+        logging.info("Arquivos tratados e salvos com sucesso.")
+    except Exception as e:
+        logging.error(f"Erro ao tratar os arquivos meteorológicos: {e}")
         return
-
-    # Listar todos os arquivos a serem processados
-    files_to_process = [
-       f for f in os.listdir(PROCESS_FOLDER) if re.match(
-            r'INMET_[A-Z]+_[A-Z]{2}_[A-Z0-9]+_.*?_\d{2}-\d{2}-\d{4}_A_\d{2}-\d{2}-\d{4}\.CSV', f, re.IGNORECASE
-        )
-    ]
-
-    if not files_to_process :
-        logging.warning("Nenhum arquivo de dados encontrado para processamento.")
-        return
-
 
     # Concatenar os arquivos processados e salvar no banco de dados
     try:
-        concatenate_and_save_to_db()
+        concatenate_and_save_to_db(PASTA_PROCESSADOS, DB_PATH, TABLE_NAME)
         logging.info("Dados salvos no banco de dados SQLite.")
     except Exception as e:
         logging.error(f"Erro ao salvar os dados no banco de dados: {e}")
+        return
 
 if __name__ == "__main__":
     main()
