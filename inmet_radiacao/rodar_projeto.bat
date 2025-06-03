@@ -1,0 +1,6 @@
+@echo off
+echo Iniciando API...
+start cmd /k "uvicorn app.main:app --reload"
+timeout /t 5
+echo Iniciando Painel Streamlit...
+start cmd /k "streamlit run interface/streamlit_app.py"
